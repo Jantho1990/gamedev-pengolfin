@@ -3,6 +3,7 @@ import Penguin from './entities/Penguin'
 import Container from '../pop/Container';
 import math from '../pop/utils/math'
 import Course from './Course';
+import Arrow from './entities/Arrow';
 
 class GameScreen extends Container {
   constructor(game, controls, onHole) {
@@ -16,10 +17,12 @@ class GameScreen extends Container {
     
     const course = new Course({ x: 450, y: 300 })
     const penguin = new Penguin({ x: this.w / 2, y: -32 })
+    const arrow = new Arrow()
 
     // Add everyone to the game
     this.penguin = this.add(penguin)
     this.course = this.add(course)
+    this.arrow = this.add(arrow)
 
     // Set up physics
     this.engine = Engine.create({
@@ -28,42 +31,40 @@ class GameScreen extends Container {
     World.add(this.engine.world, [penguin.body, course.body])
     Events.on(penguin.body, 'sleepStart', () => {
       this.ready = true
+      arrow.visible = true
     })
     
     Engine.run(this.engine)
+  }
 
-    this.render = Render.create({
-      element: document.querySelector('#board'),
-      engine: this.engine,
-      options: {
-        width: this.w,
-        height: this.h,
-        showAngleIndicator: true
-      }
-    })
-    Render.run(this.render)
+  fireAway(angle, power) {
+    const { penguin, arrow } = this
+
+    this.ready = false
+    arrow.visible = false
+    penguin.fire(angle, power)
   }
 
   update(dt, t) {
     super.update(dt, t)
-    const { penguin, h, mouse, render } = this
+    const { penguin, h, mouse, arrow } = this
 
     // Off the edge?
     if (penguin.pos.y > h) {
-      Render.stop(render)
-      
-      // Hack to remove the old render canvas
-      document.querySelector('#board').removeChild(
-        document.querySelectorAll('#board canvas')[1]
-      )
-      
       this.onHole(false, this.shows)
     }
 
-    if (mouse.released) {
-      const angle = -Math.PI / math.rand(1.75, 2.25)
-      const power = 0.01
-      penguin.fire(angle, power)
+    if (mouse.pressed) {
+      arrow.start(mouse.pos)
+    }
+
+    if (this.ready) {
+      if (mouse.isDown || mouse.released) {
+        const { angle, power } = arrow.drag(mouse.pos)
+        if (mouse.released) {
+          this.fireAway(angle, power * 0.021)
+        }
+      }
     }
 
     mouse.update()

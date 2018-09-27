@@ -1,3 +1,9 @@
+/**
+ * Get the angle between two entities.
+ * 
+ * @param {*} a 
+ * @param {*} b 
+ */
 export function angle(a, b) {
   const dx = a.x - b.x
   const dy = a.y - b.y
@@ -10,6 +16,12 @@ export function clamp(x, min, max) {
   return Math.max(min, Math.min(x, max))
 }
 
+/**
+ * Get the distance between two positions.
+ * 
+ * @param {*} a 
+ * @param {*} b 
+ */
 export function distance(a, b) {
   const dx = a.x - b.x
   const dy = a.y - b.y

@@ -11,7 +11,7 @@ class Course extends Rect {
 
     const body = Bodies.rectangle(0, 0, this.w, this.h, { isStatic: true })
     Body.setPosition(body, pos)
-    Body.rotate(body, Math.PI * 0.04)
+    // Body.rotate(body, Math.PI * 0.04)
     // Step 1: Create the body
 
     // Step 2: Sync the body and the Rect

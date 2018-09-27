@@ -36,6 +36,7 @@ export function direction(angle) {
   }
 }
 
+let random = Math.random
 export function rand(min, max) {
   return Math.floor(randf(min, max))
 }
@@ -45,7 +46,7 @@ export function randf(min, max) {
     max = min || 1
     min = 0
   }
-  return Math.random() * (max - min) + min
+  return random() * (max - min) + min
 }
 
 export function randOneIn(max = 2) {
@@ -56,6 +57,25 @@ export function randOneFrom(items) {
   return items[rand(items.length)]
 }
 
+let seed = 42;
+function randomSeed(s) {
+  if (!isNaN(s)) {
+    seed = s
+  }
+  return seed
+}
+
+function randomSeeded() {
+  // https://en.wikipedia.org/wiki/Linear_congruential_generator
+  seed = (seed * 16807 + 0) % 2147483647
+  return seed / 2147483647
+}
+
+function useSeededRandom(blnUse = true) {
+  randomSeeded()
+  random = blnUse ? randomSeeded : Math.random
+}
+
 export default {
   angle,
   clamp,
@@ -64,5 +84,7 @@ export default {
   rand,
   randf,
   randOneFrom,
-  randOneIn
+  randOneIn,
+  randomSeed,
+  useSeededRandom
 }

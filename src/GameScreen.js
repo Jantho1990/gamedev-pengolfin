@@ -6,27 +6,60 @@ import Course from './Course';
 import Arrow from './entities/Arrow';
 import Rect from '../pop/Rect';
 import entity from '../pop/utils/entity';
+import Text from '../pop/Text';
 
 class GameScreen extends Container {
-  constructor(game, controls, onHole) {
+  constructor(game, controls, onHole, stats) {
     super()
     this.w = game.w
     this.h = game.h
 
     this.ready = false
     this.onHole = onHole
+
+    this.keys = controls.keys
     this.mouse = controls.mouse
+
+    // Score
+    this.shots = stats.shots
+    this.total = stats.total
+
+    const title = this.add(new Text('Pengolfin\'', {
+      font: '32pt Freckle Face, cursive',
+      align: 'left',
+      fill: 'hsl(0, 100%, 100%)'
+    }))
+    title.pos.set(20, 20)
+
+    this.scoreText = this.add(
+      new Text('', {
+        font: '24pt Freckle Face, cursive',
+        fill: 'hsl(0, 100%, 100%)',
+        align: 'right'
+      })
+    )
+    this.scoreText.pos.set(game.w - 20, 20)
+    this.setScore()
     
     const course = new Course(this.w, this.h)
-    const penguin = new Penguin({ x: this.w / 2, y: -32 })
+    const penguin = new Penguin(course.tee)
     const arrow = new Arrow()
 
     const hole = new Rect(20, 10, { fill: 'hsl(10, 60%, 20%)'})
     hole.pos.copy(course.hole).add({ x: 0, y: 15 })
+    this.add(
+      new Text(stats.hole, {
+        font: '14pt Freckle Face, cursive',
+        fill: 'hsl(0, 0%, 0%)'
+      })
+    ).pos
+      .copy(hole.pos)
+      .add({ x: 5 - (stats.hole > 9 ? 5 : 0), y: -20 })
 
     // Add everyone to the game
     this.penguin = this.add(penguin)
     this.course = this.add(course)
+    this.waves = this.add(new Rect(this.w, 50, { fill: 'hsl(200, 20%, 20%)' }))
     this.arrow = this.add(arrow)
     this.hole = this.add(hole)
 
@@ -37,7 +70,7 @@ class GameScreen extends Container {
     World.add(this.engine.world, [penguin.body, course.body])
     Events.on(penguin.body, 'sleepStart', () => {
       if (entity.hit(penguin, hole)) {
-        this.onHole(true)
+        this.onHole(true, this.shots)
       }
       this.ready = true
       arrow.visible = true
@@ -46,9 +79,15 @@ class GameScreen extends Container {
     Engine.run(this.engine)
   }
 
+  setScore(shots = 0) {
+    this.shots += shots
+    this.scoreText.text = `Strokes: ${this.shots}    Total: ${this.total}`
+  }
+
   fireAway(angle, power) {
     const { penguin, arrow } = this
 
+    this.setScore(1)
     this.ready = false
     arrow.visible = false
     penguin.fire(angle, power)
@@ -56,11 +95,12 @@ class GameScreen extends Container {
 
   update(dt, t) {
     super.update(dt, t)
-    const { penguin, h, mouse, arrow } = this
+    const { penguin, h, mouse, arrow, waves } = this
 
     // Off the edge?
     if (penguin.pos.y > h) {
-      this.onHole(false, this.shows)
+      this.setScore(1) // penalty stroke
+      this.onHole(false, this.shots)
     }
 
     if (mouse.pressed) {
@@ -74,8 +114,14 @@ class GameScreen extends Container {
           this.fireAway(angle, power * 0.021)
         }
       }
+      // Skip the current hole
+      if (this.keys.action) {
+        this.setScore(5) // penalty stroke
+        this.onHole(true, this.shots)
+      }
     }
 
+    waves.pos.y = Math.sin(t / 800) * 7 + this.h - 20
     mouse.update()
   }
 }

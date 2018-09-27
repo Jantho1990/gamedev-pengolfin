@@ -24,6 +24,7 @@
     "budo": "^11.2.0"
   },
   "dependencies": {
-    "matter-js": "^0.14.2"
+    "matter-js": "^0.14.2",
+    "poly-decomp": "^0.3.0"
   }
 }

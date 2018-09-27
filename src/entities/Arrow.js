@@ -13,7 +13,7 @@ class Arrow extends Container {
     this.background = this.add(
       new Rect(max, 4, { fill: 'hsla(0, 0%, 0%, 0.1)' })
     )
-    this.arrow = this.add(new Rect(0, 4, { fill: 'hsl(10, 60%, 80%)' }))
+    this.arrow = this.add(new Rect(0, 4, { fill: 'hsl(10, 60%, 20%)' }))
   }
 
   start(pos) {

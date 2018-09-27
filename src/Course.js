@@ -1,26 +1,84 @@
+import decomp from 'poly-decomp'
 import { Bodies, Body } from 'matter-js'
-import Rect from '../pop/Rect';
+import math from '../pop/utils/math'
+import Container from '../pop/Container';
 import Vec from '../pop/utils/Vec';
 
-class Course extends Rect {
-  constructor(pos) {
-    super(1000, 20, { fill: '#eee' })
+window.decomp = decomp
 
-    this.pivot = new Vec(this.w, this.h).multiply(0.5)
-    this.anchor = Vec.from(this.pivot).multiply(-1)
+class Course extends Container {
+  constructor(gameW, gameH) {
+    super()
 
-    const body = Bodies.rectangle(0, 0, this.w, this.h, { isStatic: true })
-    Body.setPosition(body, pos)
-    // Body.rotate(body, Math.PI * 0.04)
-    // Step 1: Create the body
+    const segments = 13
+    const segmentWidth = 64
+    const xo = 15
+    
+    let yo = math.randOneFrom([32, 128, 300])
+    let minY = yo
+    let maxY = yo
+    let holeSegment = math.rand(segments - 7, segments)
 
-    // Step 2: Sync the body and the Rect
+    const terrainData = Array(segments).fill(0).map((_, i) => {
+      const mustBeFlat = i <= 1 || i === holeSegment
+      if (!mustBeFlat) {
+        // Randomly move up or down
+        const drop = math.randOneFrom([32, 64, 152])
+        const dir = math.randOneFrom([-1, 0, 1])
 
-    // Sync the rectangle
-    this.pos.copy(body.position)
-    this.rotation = body.angle
+        // Random go down
+        if (dir === 1 && yo - drop > 0) {
+          yo -= drop
+        }
 
-    this.body = body // store the Matter body reference
+        // Random go up
+        if (dir === -1 && yo + drop < 320) {
+          yo += drop
+        }
+        if (yo > maxY) maxY = yo
+        if (yo < minY) minY = yo
+      }
+      return { x: i * segmentWidth, y: yo }
+    })
+
+    const tee = terrainData[0]
+    const hole = terrainData[holeSegment]
+
+    // Add the hole
+    terrainData.splice(
+      holeSegment,
+      0,
+      { x: hole.x - 30, y: hole.y },
+      { x: hole.x - 30, y: hole.y + 25 },
+      { x: hole.x - 10, y: hole.y + 25 },
+      { x: hole.x - 10, y: hole.y }
+    )
+
+    // Add the base, close the path
+    const { x } = terrainData[terrainData.length - 1]
+    maxY += 52
+    terrainData.push({ x, y: maxY })
+    terrainData.push({ x: 0, y: maxY })
+
+    const h = gameH - (maxY - minY)
+
+    // Create the geometry
+    const terrain = Bodies.fromVertices(0, 0, terrainData, { isStatic: true })
+    Body.setPosition(terrain, {
+      x: -terrain.bounds.min.x + xo,
+      y: h - terrain.bounds.min.y
+    })
+
+    this.path = terrainData
+    this.style = { fill: 'hsl(0, 100%, 100%)' }
+
+    this.pos = new Vec(xo, h - minY)
+    this.hole = new Vec().copy(hole).add({ x: -15, y: h - minY })
+    this.tee = new Vec()
+      .copy(tee)
+      .add({ x: xo + segmentWidth / 2, y: h - minY - 5 })
+
+    this.body = terrain
   }
 }
 

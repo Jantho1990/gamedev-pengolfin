@@ -4,6 +4,8 @@ import Container from '../pop/Container';
 import math from '../pop/utils/math'
 import Course from './Course';
 import Arrow from './entities/Arrow';
+import Rect from '../pop/Rect';
+import entity from '../pop/utils/entity';
 
 class GameScreen extends Container {
   constructor(game, controls, onHole) {
@@ -15,14 +17,18 @@ class GameScreen extends Container {
     this.onHole = onHole
     this.mouse = controls.mouse
     
-    const course = new Course({ x: 450, y: 300 })
+    const course = new Course(this.w, this.h)
     const penguin = new Penguin({ x: this.w / 2, y: -32 })
     const arrow = new Arrow()
+
+    const hole = new Rect(20, 10, { fill: 'hsl(10, 60%, 20%)'})
+    hole.pos.copy(course.hole).add({ x: 0, y: 15 })
 
     // Add everyone to the game
     this.penguin = this.add(penguin)
     this.course = this.add(course)
     this.arrow = this.add(arrow)
+    this.hole = this.add(hole)
 
     // Set up physics
     this.engine = Engine.create({
@@ -30,6 +36,9 @@ class GameScreen extends Container {
     })
     World.add(this.engine.world, [penguin.body, course.body])
     Events.on(penguin.body, 'sleepStart', () => {
+      if (entity.hit(penguin, hole)) {
+        this.onHole(true)
+      }
       this.ready = true
       arrow.visible = true
     })

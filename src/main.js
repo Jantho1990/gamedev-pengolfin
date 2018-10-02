@@ -1,6 +1,7 @@
 import pop from '../pop'
 const { Game, entity, math, Text, KeyControls, MouseControls } = pop
-import GameScreen from './GameScreen'
+import GameScreen from './screens/GameScreen'
+import TitleScreen from './screens/TitleScreen'
 
 const game = new Game(800, 400)
 const controls = {
@@ -15,7 +16,7 @@ math.randomSeed(lastSeed)
 let hole = 0
 let total = 0
 
-function playHole(completed, shots) {
+function playHole(completed = true, shots = 0) {
   if (completed) {
     hole++
     total += shots
@@ -33,5 +34,5 @@ function playHole(completed, shots) {
   }
   game.scene = new GameScreen(game, controls, playHole, stats)
 }
-playHole(true, 0)
+game.scene = new TitleScreen(game, controls, playHole)
 game.run()

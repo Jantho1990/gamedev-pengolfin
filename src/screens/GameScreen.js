@@ -1,12 +1,12 @@
 import { Engine, Events, World, Render } from 'matter-js'
-import Penguin from './entities/Penguin'
-import Container from '../pop/Container';
-import math from '../pop/utils/math'
-import Course from './Course';
-import Arrow from './entities/Arrow';
-import Rect from '../pop/Rect';
-import entity from '../pop/utils/entity';
-import Text from '../pop/Text';
+import Penguin from '../entities/Penguin'
+import Container from '../../pop/Container';
+import math from '../../pop/utils/math'
+import Course from '../Course';
+import Arrow from '../entities/Arrow';
+import Rect from '../../pop/Rect';
+import entity from '../../pop/utils/entity';
+import Text from '../../pop/Text';
 
 class GameScreen extends Container {
   constructor(game, controls, onHole, stats) {

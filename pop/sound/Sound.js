@@ -1,5 +1,6 @@
 class Sound {
   constructor(src, options = {}) {
+    this.playing = false
     this.src = src
     this.options = Object.assign({ volume: 1 }, options)
 
@@ -12,6 +13,9 @@ class Sound {
     audio.addEventListener('error', () => {
       throw new Error(`Error loading audio source: ${audio.src}`)
     }, false)
+    audio.addEventListener('ended', () => {
+      this.playing = false
+    }, false)
     this.audio = audio
   }
 
@@ -21,10 +25,20 @@ class Sound {
     audio.volume = opts.volume
     audio.currentTime = opts.time
     audio.play()
+    this.playing = true
   }
 
   stop() {
-    //
+    this.audio.pause()
+    this.playing = false
+  }
+
+  get volume() {
+    return this.audio.volume
+  }
+
+  set volume(volume) {
+    this.options.volume = this.audio.volume = volume
   }
 }
 

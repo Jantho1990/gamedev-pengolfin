@@ -18,6 +18,7 @@ import entity from './utils/entity'
 import physics from './utils/physics'
 import Vec from './utils/Vec'
 import Sound from './sound/Sound'
+import SoundPool from './sound/SoundPool'
 
 export default {
     Camera,
@@ -32,6 +33,7 @@ export default {
     physics,
     Rect,
     Sound,
+    SoundPool,
     Sprite,
     State,
     Text,

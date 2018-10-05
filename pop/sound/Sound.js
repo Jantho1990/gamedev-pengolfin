@@ -1,3 +1,5 @@
+import Assets from '../Assets'
+
 class Sound {
   constructor(src, options = {}) {
     this.playing = false
@@ -5,8 +7,7 @@ class Sound {
     this.options = Object.assign({ volume: 1 }, options)
 
     // Configure audio element
-    const audio = new Audio()
-    audio.src = src
+    const audio = Assets.sound(src)
     if (options.loop) {
       audio.loop = true
     }

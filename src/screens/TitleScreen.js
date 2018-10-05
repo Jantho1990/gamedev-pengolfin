@@ -24,19 +24,19 @@ class TitleScreen extends Container {
     }))
     title.pos.set(game.w / 2, game.h / 2 - 40)
 
-    // sounds.theme.play()
+    sounds.theme.play()
     this.rate = 0.2
     this.next = this.rate
   }
 
   update(dt, t) {
     const { keys } = this
-    /* if (math.randOneIn(40)) {
+    if (math.randOneIn(40)) {
       sounds.plop.play()
-    } */
+    }
     if (t > this.next) {
       this.next = t + this.rate
-      plops.play()
+      // plops.play()
     }
     if (keys.action) {
       sounds.theme.stop()

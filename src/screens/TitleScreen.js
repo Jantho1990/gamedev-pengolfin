@@ -6,7 +6,7 @@ import SoundPool from '../../pop/sound/SoundPool'
 
 const sounds = {
   plop: new Sound('res/sounds/plop.mp3', { volume: 0.4 }),
-  theme: new Sound('res/sounds/theme.mp3', { volume: 0.6, loop: true })
+  theme: new Sound('res/sounds/pengolfin_theme.mp3', { volume: 0.6, loop: true })
 }
 
 const plops = new SoundPool('res/sounds/plop.mp3', { volume: 0.4 }, 3)
@@ -31,9 +31,9 @@ class TitleScreen extends Container {
 
   update(dt, t) {
     const { keys } = this
-    if (math.randOneIn(40)) {
+    /* if (math.randOneIn(40)) {
       sounds.plop.play()
-    }
+    } */
     if (t > this.next) {
       this.next = t + this.rate
       // plops.play()
